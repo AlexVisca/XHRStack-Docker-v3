@@ -1,0 +1,40 @@
+---
+version: '3'
+services:
+
+  database:
+    image: mysql:8
+    env_file:
+      - variables.env
+    volumes:
+      - data:/var/lib/mysql
+
+  application:
+    image: lxvdev/app4640_backend:latest
+    env_file:
+      - variables.env
+    depends_on:
+      - database
+
+  webserver:
+    build: 
+      context: frontend
+    image: lxvdev/app4640_frontend:webapp
+    env_file:
+      - variables.env
+    depends_on:
+      - application
+    ports:
+      - "8080:80"
+
+  loader:
+    build: 
+      context: temploader
+    image: app4640-loader
+    env_file:
+      - variables.env
+    depends_on:
+      - application
+
+volumes:
+  data:
